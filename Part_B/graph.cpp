@@ -143,45 +143,6 @@ void maze::mapMazeToGraph(maze &m, graph &g)
     }
 }
 
-bool findPathRecursive(int index, graph &g, stack<string> &s)
-{
-    if (index == g.numNodes() - 1)
-    {
-        return true;
-    }
-    g.visit(index);
-    for (int i = 0; i < g.numNodes(); i++)
-    {
-        if (g.isEdge(index, i) && !g.isVisited(i))
-        {
-            if (findPathRecursive(i, g, s))
-            {
-                string move;
-                if (g.getEdgeWeight(index, i) == 1)
-                {
-                    move = "Go Up";
-                }
-                if (g.getEdgeWeight(index, i) == 2)
-                {
-                    move = "Go Down";
-                }
-                if (g.getEdgeWeight(index, i) == 3)
-                {
-                    move = "Go Left";
-                }
-                if (g.getEdgeWeight(index, i) == 4)
-                {
-                    move = "Go Right";
-                }
-                s.push(move);
-                return true;
-            }
-            g.unVisit(i);
-        }
-    }
-    return false;
-}
-
 bool findPathNonRecursive(int start, graph &g)
 {
     stack<node> s;
@@ -208,6 +169,10 @@ bool findPathNonRecursive(int start, graph &g)
     return false;
 }
 
+bool findShortestPath1()
+{
+}
+
 int main()
 {
     char x;
@@ -229,37 +194,6 @@ int main()
             maze m(fin);
             m.print(0, 0, m.getRow() - 1, m.getCol() - 1);
             m.mapMazeToGraph(m, g);
-            // Recersive Solver
-            if (findPathRecursive(0, g, s1))
-            {
-                cout << "Solution Path Found Using Recursion: " << endl;
-                s2 = s1;
-                while (!s1.empty())
-                {
-                    cout << s1.top() << endl;
-                    s1.pop();
-                }
-            }
-            else
-            {
-                cout << "No Path Exists..." << endl;
-            }
-            // Stack Based DFS Solver
-            cout << endl;
-            g.clearVisit();
-            if (findPathNonRecursive(0, g))
-            {
-                cout << "Solution Path Found Using Stack-based DFS:" << endl;
-                while (!s2.empty())
-                {
-                    cout << s2.top() << endl;
-                    s2.pop();
-                }
-            }
-            else
-            {
-                cout << "No Path Exists..." << endl;
-            }
         }
     }
     catch (indexRangeError &ex)
