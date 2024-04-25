@@ -230,6 +230,56 @@ bool findShortestPath1(graph &g, stack<string> &s)
 
 bool findShortestPath2(graph &g, stack<string> &s)
 {
+    int n_count = g.numNodes();
+    vector<int> parents(n_count, -1);
+    vector<int> distance(n_count, 1e9);
+    distance[0] = 0;
+    for (int i = 0; i < n_count - 1; i++)
+    {
+        int min = 1e9, m_index;
+        for (int j = 0; j < n_count; j++)
+        {
+            if (!g.getNode(j).isVisited() && distance[j] <= min)
+                min = distance[j], m_index = j;
+        }
+        g.getNode(m_index).visit();
+        for (int j = 0; j < n_count; j++)
+        {
+            if (g.isEdge(m_index, j) && distance[m_index] != 1e9 && distance[m_index] + 1 < distance[j])
+            {
+                distance[j] = distance[m_index] + 1;
+                parents[j] = m_index;
+            }
+        }
+    }
+    if (distance[n_count - 1] == 1e9)
+    {
+        return false;
+    }
+    int currentNode = n_count - 1;
+    while (parents[currentNode] != -1)
+    {
+        int temp = currentNode;
+        currentNode = parents[currentNode];
+        string move;
+        if (g.getEdgeWeight(currentNode, temp) == 1)
+        {
+            move = "Go Up";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 2)
+        {
+            move = "Go Down";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 3)
+        {
+            move = "Go Left";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 4)
+        {
+            move = "Go Right";
+        }
+        s.push(move);
+    }
     return true;
 }
 
@@ -238,7 +288,7 @@ int main()
     char x;
     ifstream fin;
     // Read the maze from the file.
-    string fileName = "maze3-1.txt";
+    string fileName = "maze1.txt";
     fin.open(fileName.c_str());
     if (!fin)
     {
@@ -271,11 +321,11 @@ int main()
             g.clearVisit();
             if (findShortestPath2(g, s2))
             {
-                cout << "Solution Shortest Path Found Using Queue-based BFS Requires " << s2.size() << " Steps:" << endl;
-                while (!s1.empty())
+                cout << "Solution Shortest Path Found Using Dijkstra's Algorithm Requires " << s2.size() << " Steps:" << endl;
+                while (!s2.empty())
                 {
-                    cout << s1.top() << endl;
-                    s1.pop();
+                    cout << s2.top() << endl;
+                    s2.pop();
                 }
             }
             else

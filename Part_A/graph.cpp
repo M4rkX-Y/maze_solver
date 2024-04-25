@@ -182,17 +182,45 @@ bool findPathRecursive(int index, graph &g, stack<string> &s)
     return false;
 }
 
-bool findPathNonRecursive(int start, graph &g)
+bool findPathNonRecursive(int start, graph &g, stack<string> &m)
 {
     stack<node> s;
     node s_node = g.getNode(start);
+    int n_count = g.numNodes();
+    vector<int> parents(n_count, -1);
     s.push(s_node);
     while (!s.empty())
     {
         node n = s.top();
         s.pop();
         if (n.getId() == g.numNodes() - 1)
+        {
+            int currentNode = n_count - 1;
+            while (parents[currentNode] != -1)
+            {
+                int temp = currentNode;
+                currentNode = parents[currentNode];
+                string move;
+                if (g.getEdgeWeight(currentNode, temp) == 1)
+                {
+                    move = "Go Up";
+                }
+                if (g.getEdgeWeight(currentNode, temp) == 2)
+                {
+                    move = "Go Down";
+                }
+                if (g.getEdgeWeight(currentNode, temp) == 3)
+                {
+                    move = "Go Left";
+                }
+                if (g.getEdgeWeight(currentNode, temp) == 4)
+                {
+                    move = "Go Right";
+                }
+                m.push(move);
+            }
             return true;
+        }
         if (!g.isVisited(n.getId()))
         {
             g.visit(n.getId());
@@ -200,6 +228,7 @@ bool findPathNonRecursive(int start, graph &g)
             {
                 if (g.isEdge(n.getId(), i) && !g.isVisited(i))
                 {
+                    parents[i] = n.getId();
                     s.push(g.getNode(i));
                 }
             }
@@ -213,7 +242,7 @@ int main()
     char x;
     ifstream fin;
     // Read the maze from the file.
-    string fileName = "maze3-1.txt";
+    string fileName = "maze1.txt";
     fin.open(fileName.c_str());
     if (!fin)
     {
@@ -233,7 +262,6 @@ int main()
             if (findPathRecursive(0, g, s1))
             {
                 cout << "Solution Path Found Using Recursion: " << endl;
-                s2 = s1;
                 while (!s1.empty())
                 {
                     cout << s1.top() << endl;
@@ -247,7 +275,7 @@ int main()
             // Stack Based DFS Solver
             cout << endl;
             g.clearVisit();
-            if (findPathNonRecursive(0, g))
+            if (findPathNonRecursive(0, g, s2))
             {
                 cout << "Solution Path Found Using Stack-based DFS:" << endl;
                 while (!s2.empty())
