@@ -3,6 +3,7 @@
 #include "d_except.h"
 #include <list>
 #include <stack>
+#include <queue>
 #include <fstream>
 #include "d_matrix.h"
 #include "graph.h"
@@ -169,8 +170,67 @@ bool findPathNonRecursive(int start, graph &g)
     return false;
 }
 
-bool findShortestPath1()
+bool findShortestPath1(graph &g, stack<string> &s)
 {
+    int n_count = g.numNodes();
+    vector<int> parents(n_count, -1);
+    vector<int> distance(n_count, 1e9);
+    distance[0] = 0;
+    queue<node> q;
+    node s_node = g.getNode(0);
+    q.push(s_node);
+    while (!q.empty())
+    {
+        node n = q.front();
+        q.pop();
+        if (!g.isVisited(n.getId()))
+        {
+            g.visit(n.getId());
+            for (int i = 0; i < n_count; i++)
+            {
+                if (g.isEdge(n.getId(), i) && !g.isVisited(i))
+                {
+                    parents[i] = n.getId();
+                    distance[i] = distance[n.getId()] + 1;
+                    q.push(g.getNode(i));
+                }
+            }
+        }
+    }
+    if (distance[n_count - 1] == 1e9)
+    {
+        return false;
+    }
+    int currentNode = n_count - 1;
+    while (parents[currentNode] != -1)
+    {
+        int temp = currentNode;
+        currentNode = parents[currentNode];
+        string move;
+        if (g.getEdgeWeight(currentNode, temp) == 1)
+        {
+            move = "Go Up";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 2)
+        {
+            move = "Go Down";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 3)
+        {
+            move = "Go Left";
+        }
+        if (g.getEdgeWeight(currentNode, temp) == 4)
+        {
+            move = "Go Right";
+        }
+        s.push(move);
+    }
+    return true;
+}
+
+bool findShortestPath2(graph &g, stack<string> &s)
+{
+    return true;
 }
 
 int main()
@@ -194,6 +254,34 @@ int main()
             maze m(fin);
             m.print(0, 0, m.getRow() - 1, m.getCol() - 1);
             m.mapMazeToGraph(m, g);
+            if (findShortestPath1(g, s1))
+            {
+                cout << "Solution Shortest Path Found Using Queue-based BFS Requires " << s1.size() << " Steps:" << endl;
+                while (!s1.empty())
+                {
+                    cout << s1.top() << endl;
+                    s1.pop();
+                }
+            }
+            else
+            {
+                cout << "No Path Exists..." << endl;
+            }
+            cout << endl;
+            g.clearVisit();
+            if (findShortestPath2(g, s2))
+            {
+                cout << "Solution Shortest Path Found Using Queue-based BFS Requires " << s2.size() << " Steps:" << endl;
+                while (!s1.empty())
+                {
+                    cout << s1.top() << endl;
+                    s1.pop();
+                }
+            }
+            else
+            {
+                cout << "No Path Exists..." << endl;
+            }
         }
     }
     catch (indexRangeError &ex)
